@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent">
+
+    <ImageView
+            android:layout_width="247dp"
+            android:layout_height="231dp" android:id="@+id/imageView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="128dp" app:srcCompat="@drawable/colorgradienticon"/>
+    <TextView
+            android:text="Color Pallette Craze"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" android:id="@+id/welcomeTitle"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="32dp" android:textSize="24sp"
+            android:textStyle="bold" android:textAlignment="center"/>
+    <Button
+            android:text="Play With Colors"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/playBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintBottom_toTopOf="@+id/gameBtn"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" android:onClick="playWithColors"/>
+    <Button
+            android:text="Play A Game"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/gameBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" android:onClick="startGameMode"/>
+    <TextView
+            android:text="All computer generated colors are created using the values 0 - 255 for RED, GREEN and BLUE.  You can now do this for fun or competition by selecting the corresponding button above!"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/textView3"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintTop_toBottomOf="@+id/gameBtn"
+            android:textSize="16sp"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
