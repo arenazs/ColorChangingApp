@@ -13,7 +13,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class GameModeActivity extends AppCompatActivity {
+
+    private final int RED = 0;
+    private final int GREEN = 1;
+    private final int BLUE = 2;
 
     private int roundCount;
     private int currentTriesAvailable;
@@ -24,21 +33,34 @@ public class GameModeActivity extends AppCompatActivity {
     private Integer userRed;
     private Integer userBlue;
     private Integer userGreen;
+    private final List<Integer> userColors = new ArrayList<>();
+    private final List<EditText> userTextInfo = new ArrayList<>();
+    private final Map<Button, Integer> upAndDownButtons = new HashMap<>();
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_mode);
         startNewGame();
+        userTextInfo.add(findViewById(R.id.redNum));
+        userTextInfo.add(findViewById(R.id.greenNum));
+        userTextInfo.add(findViewById(R.id.blueNum));
+        upAndDownButtons.put((Button) findViewById(R.id.redDownBtn), RED);
+        upAndDownButtons.put((Button) findViewById(R.id.redUpBtn), RED);
+        upAndDownButtons.put((Button) findViewById(R.id.greenDownBtn), GREEN);
+        upAndDownButtons.put((Button) findViewById(R.id.greenUpBtn), GREEN);
+        upAndDownButtons.put((Button) findViewById(R.id.blueDownBtn), BLUE);
+        upAndDownButtons.put((Button) findViewById(R.id.blueUpBtn), BLUE);
     }
 
     private void startNewGame(){
         roundCount = 1;
         score = 0;
         currentTriesAvailable = 3;
-        userRed = 0;
-        userGreen = 0;
-        userBlue = 0;
+        userColors.add(0);
+        userColors.add(0);
+        userColors.add(0);
         setGameColors();
         setText();
     }
@@ -52,20 +74,15 @@ public class GameModeActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     public void newRound(View v){
-        int redScore = getScore(userRed, gameRed);
-        int greenScore = getScore(userGreen, gameGreen);
-        int blueScore = getScore(userBlue, gameBlue);
+        int redScore = getScore(userColors.get(RED), gameRed);
+        int greenScore = getScore(userColors.get(GREEN), gameGreen);
+        int blueScore = getScore(userColors.get(BLUE), gameBlue);
 
-        findViewById(R.id.backgroundLayout).setBackgroundColor(Color.rgb(userRed, userGreen, userBlue));
+        updateBackgroundColor();
         score += redScore + greenScore + blueScore;
         setScoreText(findViewById(R.id.redPercent), "Score: " + redScore);
         setScoreText(findViewById(R.id.greenPercent), "Score: " + greenScore);
         setScoreText(findViewById(R.id.bluePercent), "Score: " + blueScore);
-        try{
-            Thread.sleep(1000);
-        }catch (InterruptedException e){
-            Log.d("Error", e.getMessage());
-        }
 
         if(score >= 150){
             setContentView(R.layout.winner_splash);
@@ -75,11 +92,14 @@ public class GameModeActivity extends AppCompatActivity {
             currentTriesAvailable = 3;
             setGameColors();
             setText();
-            ((EditText)findViewById(R.id.redNum)).setText("0");
-            ((EditText)findViewById(R.id.greenNum)).setText("0");
-            ((EditText)findViewById(R.id.blueNum)).setText("0");
+            userTextInfo.get(RED).setText("0");
+            userColors.set(RED, 0);
+            userTextInfo.get(GREEN).setText("0");
+            userColors.set(GREEN, 0);
+            userTextInfo.get(BLUE).setText("0");
+            userColors.set(BLUE, 0);
         }
-    }
+    }cd 
 
     @SuppressLint("SetTextI18n")
     private void setText(){
@@ -87,37 +107,76 @@ public class GameModeActivity extends AppCompatActivity {
         ((Button)findViewById(R.id.tryBtn)).setText("Tries: " + currentTriesAvailable);
     }
 
+    public void updateColor(View v){
+        Button btnColorAndType = findViewById(v.getId());
+        int difference = Integer.parseInt(userTextInfo.get(upAndDownButtons.get(btnColorAndType)).getText().toString()) % 5;
+
+        if(btnColorAndType.getText().toString().equals("+")){
+            if(difference != 0){
+                difference = (difference - 5) * -1;
+                updateColorAndText(difference, btnColorAndType);
+            }else{
+                updateColorAndText(5, btnColorAndType);
+            }
+        }else{
+            if(difference != 0){
+                difference *= -1;
+                updateColorAndText(difference, btnColorAndType);
+            }else{
+                updateColorAndText(-5, btnColorAndType);
+            }
+        }
+    }
+
+    private void updateColorAndText(int numToAdd, Button b){
+        Integer currentNum = userColors.get(upAndDownButtons.get(b));
+        currentNum += numToAdd;
+
+        if(currentNum > 0 && currentNum < 255){
+            userColors.set(upAndDownButtons.get(b), currentNum);
+            updateBackgroundColor();
+            userTextInfo.get(upAndDownButtons.get(b)).setText(currentNum.toString());
+        }else{
+            errorPopup("Color values limited to 0 - 255");
+        }
+
+    }
+
+    private void updateBackgroundColor(){
+        findViewById(R.id.backgroundLayout).setBackgroundColor(Color.rgb(userColors.get(RED), userColors.get(GREEN), userColors.get(BLUE)));
+    }
+
     @SuppressLint("SetTextI18n")
     public void tryAColor(View v){
-        if(((EditText)findViewById(R.id.redNum)).getText().toString().isEmpty()){
-            userRed = -1;
+        if((userTextInfo.get(RED)).getText().toString().isEmpty()){
+            userColors.set(RED, -1);
         }else{
-            userRed = Integer.valueOf(((EditText)findViewById(R.id.redNum)).getText().toString());
+            userColors.set(RED, Integer.valueOf(userTextInfo.get(RED).getText().toString()));
         }
 
-        if(((EditText)findViewById(R.id.blueNum)).getText().toString().isEmpty()){
-            userBlue = -1;
+        if((userTextInfo.get(BLUE)).getText().toString().isEmpty()){
+            userColors.set(BLUE, -1);
         }else{
-            userBlue = Integer.valueOf(((EditText)findViewById(R.id.blueNum)).getText().toString());
+            userColors.set(BLUE, Integer.valueOf((userTextInfo.get(BLUE)).getText().toString()));
         }
 
-        if(((EditText)findViewById(R.id.greenNum)).getText().toString().isEmpty()){
-            userGreen = -1;
+        if((userTextInfo.get(GREEN)).getText().toString().isEmpty()){
+            userColors.set(GREEN, -1);
         }else{
-            userGreen = Integer.valueOf(((EditText)findViewById(R.id.greenNum)).getText().toString());
+            userColors.set(GREEN, Integer.valueOf((userTextInfo.get(GREEN)).getText().toString()));
         }
 
         ConstraintLayout cl = findViewById(R.id.backgroundLayout);
 
-        if(userRed > 255 || userGreen > 255 || userBlue > 255 || userRed < 0 || userGreen < 0 || userBlue < 0){
+        if(userColors.get(RED) > 255 || userColors.get(GREEN) > 255 || userColors.get(BLUE) > 255 || userColors.get(RED) < 0 || userColors.get(GREEN) < 0 || userColors.get(BLUE) < 0){
             errorPopup("Please enter a value between 0-255 for each color");
         }else if(currentTriesAvailable < 1){
             errorPopup("No more tries left, time to make your guess!");
         }else{
-            cl.setBackgroundColor(Color.rgb(userRed, userGreen, userBlue));
-            setScoreText(findViewById(R.id.redPercent), getHint(userRed, gameRed));
-            setScoreText(findViewById(R.id.greenPercent), getHint(userGreen, gameGreen));
-            setScoreText(findViewById(R.id.bluePercent), getHint(userBlue, gameBlue));
+            cl.setBackgroundColor(Color.rgb(userColors.get(RED), userColors.get(GREEN), userColors.get(BLUE)));
+            setScoreText(findViewById(R.id.redPercent), getHint(userColors.get(RED), gameRed));
+            setScoreText(findViewById(R.id.greenPercent), getHint(userColors.get(GREEN), gameGreen));
+            setScoreText(findViewById(R.id.bluePercent), getHint(userColors.get(BLUE), gameBlue));
             currentTriesAvailable--;
             setText();
         }
@@ -128,7 +187,9 @@ public class GameModeActivity extends AppCompatActivity {
     }
 
     public Integer getRandomRGB(){
-        return (int) (Math.random() * 256);
+        int color = (int) (Math.random() * 256);
+
+        return color - (color % 5);
     }
 
     private int getScore(int userColor, int gameColor){
@@ -188,4 +249,5 @@ public class GameModeActivity extends AppCompatActivity {
         ((EditText)findViewById(R.id.greenNum)).setTextColor(Color.rgb(redText, greenText, blueText));
         ((EditText)findViewById(R.id.blueNum)).setTextColor(Color.rgb(redText, greenText, blueText));
     }
+
 }
