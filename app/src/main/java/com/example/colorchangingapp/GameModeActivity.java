@@ -99,7 +99,7 @@ public class GameModeActivity extends AppCompatActivity {
             userTextInfo.get(BLUE).setText("0");
             userColors.set(BLUE, 0);
         }
-    }cd 
+    }
 
     @SuppressLint("SetTextI18n")
     private void setText(){
