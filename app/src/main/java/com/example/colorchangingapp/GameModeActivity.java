@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,6 +21,8 @@ import java.util.Map;
 
 public class GameModeActivity extends AppCompatActivity {
 
+    private static final int WINNING_SCORE = 100;
+
     private final int RED = 0;
     private final int GREEN = 1;
     private final int BLUE = 2;
@@ -30,9 +33,6 @@ public class GameModeActivity extends AppCompatActivity {
     private int gameRed;
     private int gameGreen;
     private int gameBlue;
-    private Integer userRed;
-    private Integer userBlue;
-    private Integer userGreen;
     private final List<Integer> userColors = new ArrayList<>();
     private final List<EditText> userTextInfo = new ArrayList<>();
     private final Map<Button, Integer> upAndDownButtons = new HashMap<>();
@@ -84,7 +84,7 @@ public class GameModeActivity extends AppCompatActivity {
         setScoreText(findViewById(R.id.greenPercent), "Score: " + greenScore);
         setScoreText(findViewById(R.id.bluePercent), "Score: " + blueScore);
 
-        if(score >= 150){
+        if(score >= WINNING_SCORE){
             setContentView(R.layout.winner_splash);
             ((TextView)findViewById(R.id.finalScoreText)).setText("Final Score: " + score + "      Total Rounds: " + roundCount);
         }else{
@@ -107,8 +107,9 @@ public class GameModeActivity extends AppCompatActivity {
         ((Button)findViewById(R.id.tryBtn)).setText("Tries: " + currentTriesAvailable);
     }
 
-    public void updateColor(View v){
+    public void updateColor(View v) throws InterruptedException {
         Button btnColorAndType = findViewById(v.getId());
+
         int difference = Integer.parseInt(userTextInfo.get(upAndDownButtons.get(btnColorAndType)).getText().toString()) % 5;
 
         if(btnColorAndType.getText().toString().equals("+")){
@@ -129,7 +130,7 @@ public class GameModeActivity extends AppCompatActivity {
     }
 
     private void updateColorAndText(int numToAdd, Button b){
-        Integer currentNum = userColors.get(upAndDownButtons.get(b));
+        Integer currentNum = Integer.parseInt(userTextInfo.get(upAndDownButtons.get(b)).getText().toString());
         currentNum += numToAdd;
 
         if(currentNum > 0 && currentNum < 255){
